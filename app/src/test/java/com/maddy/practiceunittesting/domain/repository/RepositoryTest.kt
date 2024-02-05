@@ -19,7 +19,7 @@ class RepositoryTest {
     fun repoTest() = runTest {
         // Arrange
         // val spyDb = spyk<LocalDatabase>()    // Works as a spy
-        val mockDb = mockk<LocalDatabase>(relaxUnitFun = true)
+        val mockDb = mockk<LocalDatabase>(relaxUnitFun = true)      // relaxUnitFun = true; pre-stubs functions that return Unit
         val repository = Repository(
             db = mockDb,
             ioDispatcher = StandardTestDispatcher(testScheduler)    // always share Scheduler
@@ -34,5 +34,12 @@ class RepositoryTest {
 
         // Assert
         assertThat(data).isEqualTo("Hello world")
+
+        // Using coVerifySequence{} to verify the order of function calls,
+        // and that only these functions are called
+        coVerifySequence {
+            mockDb.populate()
+            mockDb.read()
+        }
     }
 }
