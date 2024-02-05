@@ -16,6 +16,7 @@ class UserRepositoryTest {
         // Act
         launch { repo.register("Alice") }
         launch { repo.register("Bob") }
+        advanceUntilIdle()
 
         // Assert
         Truth.assertThat(repo.getAllUsers())

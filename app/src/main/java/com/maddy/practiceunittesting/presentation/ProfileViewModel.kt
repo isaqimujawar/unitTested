@@ -9,7 +9,7 @@ class ProfileViewModel(
     private val repository: UserRepository = UserRepository()
 ) : ViewModel() {
 
-    lateinit var user: String
+    var user: String = ""
 
     fun initialize() {
         viewModelScope.launch {

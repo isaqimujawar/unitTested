@@ -2,12 +2,17 @@ package com.maddy.practiceunittesting.domain.repository
 
 import com.google.common.truth.Truth.assertThat
 import com.maddy.practiceunittesting.data.DataSource
+import com.maddy.practiceunittesting.data.HotDataSourceImpl
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -30,14 +35,35 @@ class FlowRepositoryTest {
         assertThat(values[1]).isEqualTo(20)
         assertThat(values).hasSize(4)
 
+        val someValues = repository.scores().take(2).toList()
+        assertThat(someValues[0]).isEqualTo(10)
+        assertThat(someValues[1]).isEqualTo(20)
+        assertThat(someValues).hasSize(2)
 
         // Verify
         verify {
             mockDataSource.counts()
         }
     }
+
+
+    @Test
+    fun continuouslyCollect() = runTest {
+        // Arrange
+        val mockDataSource = spyk<HotDataSourceImpl>()
+        val repository = FlowRepository(mockDataSource)
+        val values = mutableListOf<Int>()
+
+        // Act
+        launch(UnconfinedTestDispatcher()) {
+            // repository.scores().collect() { values += it }
+            repository.scores().toList(values)
+        }
+
+        // coEvery { mockDataSource.emit(1) } returns Unit
+        mockDataSource.emit(1)
+
+        // Assert
+        assertThat(values[0]).isEqualTo(10)
+    }
 }
-
-/*
-
-* */
