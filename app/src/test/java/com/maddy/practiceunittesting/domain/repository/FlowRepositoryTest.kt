@@ -3,6 +3,7 @@ package com.maddy.practiceunittesting.domain.repository
 import com.google.common.truth.Truth.assertThat
 import com.maddy.practiceunittesting.data.DataSource
 import com.maddy.practiceunittesting.data.HotDataSourceImpl
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -55,15 +56,20 @@ class FlowRepositoryTest {
         val values = mutableListOf<Int>()
 
         // Act
-        launch(UnconfinedTestDispatcher()) {
+        val collectJob = launch(UnconfinedTestDispatcher()) {
             // repository.scores().collect() { values += it }
             repository.scores().toList(values)
         }
 
-        // coEvery { mockDataSource.emit(1) } returns Unit
         mockDataSource.emit(1)
 
         // Assert
         assertThat(values[0]).isEqualTo(10)
+
+        collectJob.cancel()
+
+        coVerify(exactly = 1) {
+            mockDataSource.emit(1)
+        }
     }
 }
