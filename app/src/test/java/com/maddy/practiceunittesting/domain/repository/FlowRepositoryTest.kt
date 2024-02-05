@@ -3,6 +3,7 @@ package com.maddy.practiceunittesting.domain.repository
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.maddy.practiceunittesting.data.ColdDataSourceImpl
+import com.maddy.practiceunittesting.data.DataSource
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
@@ -16,7 +17,7 @@ class FlowRepositoryTest {
     @Test
     fun useTerminalOperators() = runTest {
         // Arrange
-        val mockDataSource = mockk<ColdDataSourceImpl>()
+        val mockDataSource = mockk<DataSource>()
         every { mockDataSource.counts() } answers { flowOf(1, 2, 3, 4, 5) }
 
         val repository = FlowRepository(mockDataSource)
