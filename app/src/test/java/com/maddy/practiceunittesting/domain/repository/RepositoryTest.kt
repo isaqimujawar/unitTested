@@ -5,6 +5,7 @@ import com.maddy.practiceunittesting.data.LocalDatabase
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -14,7 +15,10 @@ class RepositoryTest {
     fun repoTest() = runTest {
         // Arrange
         val mockDb = mockk<LocalDatabase>()
-        val repository = Repository(mockDb)
+        val repository = Repository(
+            db = mockDb,
+            ioDispatcher = StandardTestDispatcher(testScheduler)    // always share Scheduler
+        )
         every { mockDb.populate() } returns Unit
         every { mockDb.read() } returns "Hello world"
 
