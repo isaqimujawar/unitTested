@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 
 class Repository(
     private val db: LocalDatabase = LocalDatabase(),
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val scope = CoroutineScope(ioDispatcher)
 
