@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -23,8 +24,9 @@ class RepositoryTest {
         every { mockDb.read() } returns "Hello world"
 
         // Act
-        repository.initialize()
+        repository.initialize().await()
         val data = repository.fetchData()
+        advanceUntilIdle()
 
         // Assert
         assertThat(data).isEqualTo("Hello world")
