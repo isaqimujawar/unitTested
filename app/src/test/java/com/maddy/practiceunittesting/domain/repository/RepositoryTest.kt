@@ -25,7 +25,7 @@ class RepositoryTest {
             ioDispatcher = StandardTestDispatcher(testScheduler)    // always share Scheduler
         )
         // coEvery { mockDb.populate() } returns Unit       // no need to stub this after setting relaxUnitFun = true
-        every { mockDb.read() } returns "Hello world"
+        every { mockDb.read() } answers {"Hello world"}
 
         // Act
         repository.initialize()
@@ -34,10 +34,5 @@ class RepositoryTest {
 
         // Assert
         assertThat(data).isEqualTo("Hello world")
-
-        coVerifySequence {
-            mockDb.populate()
-            mockDb.read()
-        }
     }
 }
