@@ -62,12 +62,17 @@ class FlowRepositoryTest {
         }
 
         mockDataSource.emit(1)
-
-        // Assert
         assertThat(values[0]).isEqualTo(10)
+
+        mockDataSource.emit(2)
+        mockDataSource.emit(3)
+        assertThat(values.last()).isEqualTo(30)
+        assertThat(values).hasSize(3)
 
         coVerify(exactly = 1) {
             mockDataSource.emit(1)
+            mockDataSource.emit(2)
+            mockDataSource.emit(3)
         }
     }
 }
