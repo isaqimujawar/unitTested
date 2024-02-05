@@ -55,8 +55,8 @@ class FlowRepositoryTest {
         val repository = FlowRepository(mockDataSource)
         val values = mutableListOf<Int>()
 
-        // Act
-        val collectJob = launch(UnconfinedTestDispatcher()) {
+        // Using backgroundScope.launch{...} for coroutines that do not complete. Example for Hot Flows
+        backgroundScope.launch(UnconfinedTestDispatcher()) {
             // repository.scores().collect() { values += it }
             repository.scores().toList(values)
         }
@@ -65,8 +65,6 @@ class FlowRepositoryTest {
 
         // Assert
         assertThat(values[0]).isEqualTo(10)
-
-        collectJob.cancel()
 
         coVerify(exactly = 1) {
             mockDataSource.emit(1)
