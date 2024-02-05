@@ -20,11 +20,11 @@ class RepositoryTest {
             db = mockDb,
             ioDispatcher = StandardTestDispatcher(testScheduler)    // always share Scheduler
         )
-        every { mockDb.populate() } returns Unit
+        coEvery { mockDb.populate() } returns Unit
         every { mockDb.read() } returns "Hello world"
 
         // Act
-        repository.initialize().await()
+        repository.initialize()
         val data = repository.fetchData()
         advanceUntilIdle()
 

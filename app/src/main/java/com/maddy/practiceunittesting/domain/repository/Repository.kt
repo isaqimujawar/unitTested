@@ -15,15 +15,9 @@ class Repository(
 ) {
     private val scope = CoroutineScope(ioDispatcher)
 
-    /**
-     * Use async to start the coroutine and then use await() at the call site.
-     * Because launch - Fire and Forget i.e., will start a Coroutine and forget.
-     * async will start and await of the coroutine to finish the job and return a valur.
-     * Using async you will know whether the coroutine actually finished the job.
-     */
-    fun initialize(): Deferred<Unit> {
-        // scope.launch. { db.populate() }
-        return scope.async { db.populate() }
+
+    suspend fun initialize() {
+        db.populate()
     }
 
     suspend fun fetchData(): String = withContext(ioDispatcher) {
