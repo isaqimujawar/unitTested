@@ -1,5 +1,6 @@
 package com.maddy.practiceunittesting.domain.repository
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.maddy.practiceunittesting.data.DataSource
 import com.maddy.practiceunittesting.data.HotDataSourceImpl
@@ -8,6 +9,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
@@ -73,6 +75,24 @@ class FlowRepositoryTest {
             mockDataSource.emit(1)
             mockDataSource.emit(2)
             mockDataSource.emit(3)
+        }
+    }
+
+    @Test
+    fun continuouslyCollectWithTurbine() = runTest {
+        // Arrange
+        val mockDataSource = spyk<HotDataSourceImpl>()
+        val repository = FlowRepository(mockDataSource)
+
+        val values: Flow<Int> = repository.scores()
+
+        backgroundScope.launch(UnconfinedTestDispatcher()) {
+            values.test {
+                mockDataSource.emit(1)
+                assertThat(awaitItem()).isEqualTo(10)
+                mockDataSource.emit(2)
+                assertThat(expectMostRecentItem()).isEqualTo(20)
+            }
         }
     }
 }
