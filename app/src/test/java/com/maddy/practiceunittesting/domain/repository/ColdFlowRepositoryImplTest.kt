@@ -19,7 +19,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
-class FlowRepositoryTest {
+class ColdFlowRepositoryImplTest {
 
     @Test
     fun useTerminalOperators() = runTest {
@@ -27,7 +27,7 @@ class FlowRepositoryTest {
         val mockDataSource = mockk<DataSource>()
         every { mockDataSource.counts() } answers { flowOf(1, 2, 3, 4) }
 
-        val repository = FlowRepository(mockDataSource)
+        val repository = ColdFlowRepositoryImpl(mockDataSource)
 
         // Act and Assert
         val first = repository.scores().first()
@@ -54,7 +54,7 @@ class FlowRepositoryTest {
     fun continuouslyCollect() = runTest {
         // Arrange
         val mockDataSource = spyk<HotDataSourceImpl>()
-        val repository = FlowRepository(mockDataSource)
+        val repository = ColdFlowRepositoryImpl(mockDataSource)
         val values = mutableListOf<Int>()
 
         // Using backgroundScope.launch{...} for coroutines that do not complete. Example for Hot Flows
@@ -82,7 +82,7 @@ class FlowRepositoryTest {
     fun continuouslyCollectWithTurbine() = runTest {
         // Arrange
         val mockDataSource = spyk<HotDataSourceImpl>()
-        val repository = FlowRepository(mockDataSource)
+        val repository = ColdFlowRepositoryImpl(mockDataSource)
 
         val values: Flow<Int> = repository.scores()
 
