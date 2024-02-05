@@ -1,22 +1,29 @@
 package com.maddy.practiceunittesting.presentation
 
-import kotlinx.coroutines.test.runTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Assert.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Test
 
 class HomeViewModelTest {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testLoadMessage() = runTest {
+    fun testGreetings() = runTest {
         // Arrange
-        val viewModel = HomeViewModel()
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)    // share the Scheduler
+        Dispatchers.setMain(testDispatcher)     // Sets the given dispatcher as an underlying dispatcher of Dispatchers.Main.
 
-        // Act
-        val result = viewModel.loadMessage()
-
-        // Assert
-        assertThat(result)
-            .isEqualTo("Greetings!")
+        try {
+            val viewModel = HomeViewModel()
+            viewModel.loadMessage()
+            assertThat(viewModel.message.value).isEqualTo("Greetings!")
+        } finally {
+            Dispatchers.resetMain()         // Resets state of the Dispatchers.Main to the original main dispatcher.
+        }
     }
 }
